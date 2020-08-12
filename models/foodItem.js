@@ -16,7 +16,7 @@ var FoodItem = mongoose.model(
     type : Array,
 
   },*/
-    subTitle: {
+    description: {
       type: String,
     },
     price: {
@@ -24,7 +24,7 @@ var FoodItem = mongoose.model(
       required: true,
       min: 0,
     },
-    class: {
+    category: {
       type: String,
       required: true,
     },
@@ -36,11 +36,11 @@ var FoodItem = mongoose.model(
 
 function validateItem(foodItem) {
   const schema = Joi.object({
-    title: Joi.string().min(5).max(50).required(),
+    title: Joi.string().required(),
     hall: Joi.number().required(),
-    class: Joi.string(),
+    category: Joi.string().required(),
     price: Joi.number().min(0).required(),
-    subTitle: Joi.string(),
+    description: Joi.string().required(),
   });
 
   // return Joi.validate(foodItem, schema);
