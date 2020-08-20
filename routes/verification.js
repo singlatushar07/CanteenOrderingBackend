@@ -26,12 +26,7 @@ verificationrouter.post("/verify", async (req, res) => {
       user.otp = null;
       await user.save();
       const token = user.generateAuthToken();
-      res
-        .header("x-auth-token", token)
-        .status(200)
-        .send(
-          JSON.stringify(_.pick(user, ["_id", "email", "name", "isVerified"]))
-        );
+      res.header("x-auth-token", token).status(200).send(JSON.stringify(user));
     } else {
       res.status(401).send(JSON.stringify({ isVerified: false }));
     }
