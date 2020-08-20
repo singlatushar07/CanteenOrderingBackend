@@ -7,8 +7,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 require("dotenv").config();
-
-const nodemailer = require("nodemailer");
 const { getMaxListeners } = require("npm");
 const mail = require("../middleware/mail");
 userrouter.route("/me").get(auth, async (req, res) => {
@@ -34,25 +32,8 @@ userrouter.post("/register", async (req, res) => {
     user.password = await bcrypt.hash(user.password, salt);
     await user.save();
     console.log(user._id);
-    //user.dropIndex("createdat");
-    user.save;
     mail(user.name, OTP, user.email);
-    // var myVar;
-    // // var b = await User.findByIdAndDelete(user._id);
-    // // console.log(b);
-    // async function f(){
-    //   myVar = setTimeout(function () {
-    //     await User.findByIdAndDelete(user._id);
-    //     return res.status(400).send("thanks");
-    //   }, 5000);
-    // };
 
-    // function myStopFunction() {
-    //   clearTimeout(myVar);
-    // }
-    // await f();
-    // if (a == 1) myStopFunction();
-    //console.log(createdat);
     const token = user.generateAuthToken();
     res
       .header("x-auth-token", token)
@@ -60,7 +41,19 @@ userrouter.post("/register", async (req, res) => {
       .send(_.pick(user, ["_id", "email", "name"]));
   }
 });
+userrouter.put("/register/delete", async (req, res) => {
+  console.log(req.body.id);
 
+  try {
+    const user = await User.findByIdAndRemove(req.body.id);
+    if (!user)
+      return res.status(404).send("The item with the given ID was not found.");
+
+    res.status(200).send(user);
+  } catch (err) {
+    console.log(err);
+  }
+});
 // "confirmPassword": "gggggggg",
 // "email": "a@f.com",
 // "hall": "13",

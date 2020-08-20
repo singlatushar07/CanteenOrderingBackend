@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const jwt = require("jsonwebtoken");
-const { number } = require("joi");
+const { number, string } = require("joi");
 require("dotenv").config();
 const RegisterSchema = new Schema({
   hall: {
@@ -42,15 +42,12 @@ const RegisterSchema = new Schema({
   otp: {
     type: Number,
   },
-  createdat: {
-    type: Date,
-    default: Date.now,
-    expires: 120,
-    partialFilterExpression: {
-      isVerified: true,
-    },
+  mobile: {
+    type: String,
+    default: "4676676767",
   },
 });
+
 RegisterSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     {
@@ -59,12 +56,29 @@ RegisterSchema.methods.generateAuthToken = function () {
       name: this.name,
       email: this.email,
       isVerified: this.isVerified,
+      hall: this.hall,
+      room: this.room,
+      mobile: this.mobile,
     },
     process.env.jwtPrivateKey
   );
   return token;
 };
+
 var User = mongoose.model("User", RegisterSchema);
+mongoose.model("User").ensureIndexes(function (err) {
+  console.log("ensure index", err);
+});
+// RegisterSchema.index(
+//   { createdat: 1 },
+//   {
+//     expireAfterSeconds: 60, // 2 days
+//     partialFilterExpression: {
+//       isVerified: true,
+//     },
+//   }
+// );
+
 /*
 Object {
   "confirmPassword": "gggggggg",

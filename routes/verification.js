@@ -29,9 +29,23 @@ verificationrouter.post("/verify", async (req, res) => {
       res
         .header("x-auth-token", token)
         .status(200)
-        .send(_.pick(user, ["_id", "email", "name"]));
+        .send(
+          JSON.stringify(_.pick(user, ["_id", "email", "name", "isVerified"]))
+        );
+    } else {
+      res.status(401).send(JSON.stringify({ isVerified: false }));
     }
   }
+});
+verificationrouter.post("/verify/resend", async (req, res) => {
+  console.log(req.body);
+  let user = await User.findById(req.body.id);
+
+  console.log(user._id);
+  mail(user.name, user.otp, user.email);
+
+  const token = user.generateAuthToken();
+  res.status(200).send("done");
 });
 
 // "confirmPassword": "gggggggg",
