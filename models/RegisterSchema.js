@@ -42,6 +42,9 @@ const HistorySchema = new Schema({
   totalPrice: {
     type: Number,
   },
+  quantity: {
+    type: Number,
+  },
 });
 const RegisterSchema = new Schema({
   hall: {

@@ -24,6 +24,7 @@ userrouter.post("/register", async (req, res) => {
     res.status(400).send("user already registers");
   } else {
     var OTP = otp();
+    console.log(OTP);
     user = new User(
       _.pick(req.body, [
         "hall",
