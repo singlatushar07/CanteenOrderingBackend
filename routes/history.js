@@ -3,8 +3,15 @@ const HistorySchema = require("../models/RegisterSchema");
 const router = express.Router();
 const { FoodItem } = require("../models/foodItem");
 const { findById } = require("../models/RegisterSchema");
+
+router.get("/history", async (req, res) => {
+  const foodItems = await HistorySchema.find();
+  console.log(foodItems);
+  res.send(foodItems);
+});
+
 router.post("/history", async (req, res) => {
-  let user = await HistorySchema.findOne({ _id: req.body.id });
+  let user = await HistorySchema.findOne({ _id: req.body.userId });
 
   console.log(req.body);
 
@@ -37,10 +44,14 @@ router.get("/history/:id", async (req, res) => {
 
   for (var i = 0; i < user.history.length; i++) {
     for (var j = 0; j < user.history[i].items.length; j++) {
-      const item = await FoodItem.findById(user.history[i].items[j].id);
+      let item = await FoodItem.findById(
+        user.history[i].items[j].id
+      ).map((item) => item.toObject());
+      item.quantity = user.history[i].items[j].quantity;
       user.history[i].items[j] = item;
     }
   }
-  res.status(200).send(user.history);
+
+  res.send(user.history);
 });
 module.exports = router;
