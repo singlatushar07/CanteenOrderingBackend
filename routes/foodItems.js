@@ -65,4 +65,27 @@ router.put("/:id", [auth, admin], async (req, res) => {
   res.send(foodItem);
 });
 
+// Object : {"hall": 2,
+// "isDineIn": false,
+// "items": Array [
+//   Object {
+//     "id": "5f36ac6211aadbd1d82da6e4",
+//     "quantity": 1,
+//   },
+//   Object {
+//     "id": "5f36ac1d11aadbd1d82da6e1",
+//     "quantity": 1,
+//   },
+// ],
+// "payment_method": "COD",
+// "room": "",
+// "time": "22/8/2020 20:14",
+// "totalPrice": 100,}
+
+router.get("/:id", async (req, res) => {
+  const foodItems = await FoodItem.find({ _id: req.params.id });
+  console.log(foodItems);
+  res.status(200).send(foodItems);
+});
+
 module.exports = router;

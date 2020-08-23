@@ -4,6 +4,45 @@ const Schema = mongoose.Schema;
 const jwt = require("jsonwebtoken");
 const { number, string } = require("joi");
 require("dotenv").config();
+
+// const itemschema = new Schema({
+//   id: {
+//     type: String,
+//   },
+//   quantity: {
+//     type: Number,
+//     required: true,
+//   },
+// });
+const HistorySchema = new Schema({
+  hall: {
+    type: Number,
+    required: true,
+  },
+
+  isDineIn: {
+    type: Boolean,
+  },
+  items: {
+    type: Array,
+  },
+
+  payment_method: {
+    type: String,
+    //required: true,
+  },
+  room: {
+    type: String,
+    //required: true,
+  },
+  time: {
+    type: Date,
+    default: Date.now,
+  },
+  totalPrice: {
+    type: Number,
+  },
+});
 const RegisterSchema = new Schema({
   hall: {
     type: String,
@@ -46,6 +85,7 @@ const RegisterSchema = new Schema({
     type: String,
     default: "4676676767",
   },
+  history: [HistorySchema],
 });
 
 RegisterSchema.methods.generateAuthToken = function () {
@@ -66,31 +106,5 @@ RegisterSchema.methods.generateAuthToken = function () {
 };
 
 var User = mongoose.model("User", RegisterSchema);
-mongoose.model("User").ensureIndexes(function (err) {
-  console.log("ensure index", err);
-});
-// RegisterSchema.index(
-//   { createdat: 1 },
-//   {
-//     expireAfterSeconds: 60, // 2 days
-//     partialFilterExpression: {
-//       isVerified: true,
-//     },
-//   }
-// );
-
-/*
-Object {
-  "confirmPassword": "gggggggg",
-  "email": "a@f.com",
-  "hall": "13",
-  "name": "Fr",
-  "password": "gggggggg",
-  "rollNo": "",
-  "room": "Vg",
-}
-58
-
-*/
 
 module.exports = User;

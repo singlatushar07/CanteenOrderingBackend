@@ -25,12 +25,4 @@ authrouter.route("/").post(async (req, res) => {
   res.send(token);
 });
 
-// "confirmPassword": "gggggggg",
-// "email": "a@f.com",
-// "hall": "13",
-// "name": "Fr",
-// "password": "gggggggg",
-// "rollNo": "",
-// "room": "Vg",
-
 module.exports = authrouter;

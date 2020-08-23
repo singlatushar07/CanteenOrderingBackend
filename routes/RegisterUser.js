@@ -25,7 +25,15 @@ userrouter.post("/register", async (req, res) => {
   } else {
     var OTP = otp();
     user = new User(
-      _.pick(req.body, ["hall", "email", "name", "password", "rollNo", "room","mobile"])
+      _.pick(req.body, [
+        "hall",
+        "email",
+        "name",
+        "password",
+        "rollNo",
+        "room",
+        "mobile",
+      ])
     );
     user.otp = OTP;
     const salt = await bcrypt.genSalt(10);
