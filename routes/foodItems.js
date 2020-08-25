@@ -3,8 +3,7 @@ const express = require("express");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const router = express.Router();
-const multer = require("multer");
-const upload = multer({ dest: "upload/" });
+
 router.get("/", async (req, res) => {
   const foodItems = await FoodItem.find().sort("hall");
   console.log(foodItems);
@@ -64,10 +63,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
     return res.status(404).send("The item with the given ID was not found.");
 
   res.send(foodItem);
-});
-router.post("/pic", upload.single("img"), async (req, res) => {
-  console.log(req.file);
-  res.send("image saved");
 });
 
 // Object : {"hall": 2,

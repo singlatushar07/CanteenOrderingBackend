@@ -1,46 +1,48 @@
 const express = require("express");
 const userrouter = express.Router();
 const User = require("../models/RegisterSchema");
-const { json } = require("body-parser");
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 require("dotenv").config();
-const { getMaxListeners } = require("npm");
+const multer = require("multer");
+const upload = multer({ dest: "upload/" });
 const mail = require("../middleware/mail");
 userrouter.route("/me").get(auth, async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
   res.send(user);
 });
 const otp = require("../middleware/otpgenerate");
-userrouter.post("/register", async (req, res) => {
-  console.log(req.body);
-  // res.send(JSON.stringify(req.body));
-
+userrouter.post("/register", upload.single("image"), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
-  console.log(user);
+
   if (user) {
     res.status(400).send("user already registers");
   } else {
     var OTP = otp();
     console.log(OTP);
     user = new User(
-      _.pick(req.body, [
-        "hall",
-        "email",
-        "name",
-        "password",
-        "rollNo",
-        "room",
-        "mobile",
-      ])
+      Object.assign(
+        _.pick(req.body, [
+          "hall",
+          "email",
+          "name",
+          "password",
+          "rollNo",
+          "room",
+          "mobile",
+        ]),
+        {
+          imagePath: req.file.path,
+        }
+      )
     );
     user.otp = OTP;
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     await user.save();
-    console.log(user._id);
+    console.log(user);
     mail(user.name, OTP, user.email);
 
     const token = user.generateAuthToken();

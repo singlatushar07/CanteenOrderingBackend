@@ -88,6 +88,10 @@ const RegisterSchema = new Schema({
     type: String,
     default: "4676676767",
   },
+  imagePath: {
+    type: String,
+    required: true,
+  },
   history: [HistorySchema],
 });
 
