@@ -22,6 +22,7 @@ authrouter.route("/").post(async (req, res) => {
       );
       if (!validPassword) {
         return res.status(400).send("Invalid E-mail or Password.");
+      } else {
         const token = user.generateAuthToken();
         res.send(token);
       }
