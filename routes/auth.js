@@ -13,16 +13,22 @@ authrouter.route("/").post(async (req, res) => {
   if (!user) {
     return res.status(400).send("Invalid E-mail or Password.");
   } else {
-    const validPassword = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
-
-    if (!validPassword)
-      return res.status(400).send("Invalid E-mail or Password.");
+    if (!user.isVerified) {
+      res
+        .status(400)
+        .send("User is not verified. Kindly verify and try login later.");
+    } else {
+      const validPassword = await bcrypt.compare(
+        req.body.password,
+        user.password
+      );
+      if (!validPassword) {
+        return res.status(400).send("Invalid E-mail or Password.");
+        const token = user.generateAuthToken();
+        res.send(token);
+      }
+    }
   }
-  const token = user.generateAuthToken();
-  res.send(token);
 });
 
 module.exports = authrouter;
