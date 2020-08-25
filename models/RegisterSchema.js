@@ -90,7 +90,6 @@ const RegisterSchema = new Schema({
   },
   imagePath: {
     type: String,
-    required: true,
   },
   history: [HistorySchema],
 });
@@ -106,6 +105,7 @@ RegisterSchema.methods.generateAuthToken = function () {
       hall: this.hall,
       room: this.room,
       mobile: this.mobile,
+      imagePath: this.imagePath,
     },
     process.env.jwtPrivateKey
   );

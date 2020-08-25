@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
+const { string } = require("joi");
 
 var FoodItem = mongoose.model(
   "FoodItem",
@@ -12,10 +13,9 @@ var FoodItem = mongoose.model(
       type: String,
       required: true,
     },
-    /*image :{
-    type : Array,
-
-  },*/
+    image: {
+      type: String,
+    },
     description: {
       type: String,
     },
@@ -31,6 +31,9 @@ var FoodItem = mongoose.model(
     id: {
       type: String,
     },
+    image: {
+      type: String,
+    },
   })
 );
 
@@ -41,6 +44,7 @@ function validateItem(foodItem) {
     category: Joi.string().required(),
     price: Joi.number().min(0).required(),
     description: Joi.string().required(),
+    image: Joi.string(),
   });
 
   // return Joi.validate(foodItem, schema);

@@ -6,9 +6,18 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 require("dotenv").config();
+const mail = require("../middleware/mail");
+//muler
 const multer = require("multer");
 const upload = multer({ dest: "upload/" });
-const mail = require("../middleware/mail");
+
+const cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: "anam",
+  api_key: "531277261252188",
+  api_secret: "YWc1GhUuPcOFDGapf-mhpGWo6co",
+});
+
 userrouter.route("/me").get(auth, async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
   res.send(user);
@@ -18,26 +27,39 @@ userrouter.post("/register", upload.single("image"), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
 
   if (user) {
-    res.status(400).send("user already registers");
+    res.status(400).send("user already registered");
   } else {
     var OTP = otp();
     console.log(OTP);
-    user = new User(
-      Object.assign(
-        _.pick(req.body, [
-          "hall",
-          "email",
-          "name",
-          "password",
-          "rollNo",
-          "room",
-          "mobile",
-        ]),
-        {
-          imagePath: req.file.path,
-        }
-      )
-    );
+
+    try {
+      const fileStr = req.file.path;
+      const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+        folder: "Users",
+      });
+      console.log(uploadResponse.url);
+      user = new User(
+        Object.assign(
+          _.pick(req.body, [
+            "hall",
+            "email",
+            "name",
+            "password",
+            "rollNo",
+            "room",
+            "mobile",
+          ]),
+          {
+            imagePath: uploadResponse.url,
+          }
+        )
+      );
+      //res.json({ msg: "yaya" });
+    } catch (err) {
+      console.error(err);
+      // res.status(500).json({ err: 'Something went wrong' });
+    }
+
     user.otp = OTP;
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);

@@ -3,6 +3,17 @@ const express = require("express");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const router = express.Router();
+const _ = require("lodash");
+
+const multer = require("multer");
+const upload = multer({ dest: "upload/" });
+
+const cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: "anam",
+  api_key: "531277261252188",
+  api_secret: "YWc1GhUuPcOFDGapf-mhpGWo6co",
+});
 
 router.get("/", async (req, res) => {
   const foodItems = await FoodItem.find().sort("hall");
@@ -18,13 +29,35 @@ router.get("/:hall", async (req, res) => {
   res.send(foodItems);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-  let foodItem = new FoodItem(req.body);
-  foodItem = await foodItem.save();
+router.post("/", upload.single("image"), async (req, res) => {
+  //const { error } = validate(req.body);
+  //if (error) return res.status(400).send(error.details[0].message);
+  //let foodItem = new FoodItem(req.body);
 
-  res.send(foodItem);
+  //res.send(foodItem);
+  console.log(req.file, req.body);
+  try {
+    const fileStr = req.file.path;
+    console.log(req.file.path);
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+      folder: `foodItems/hall${req.body.hall}`,
+    });
+    console.log(uploadResponse.url);
+    const foodItem = new FoodItem(
+      Object.assign(
+        _.pick(req.body, ["title", "hall", "description", "category", "price"]),
+        {
+          image: uploadResponse.url,
+        }
+      )
+    );
+    await foodItem.save();
+    //res.json({ msg: "yaya" });
+  } catch (err) {
+    console.error(err);
+    // res.status(500).json({ err: 'Something went wrong' });
+  }
+  //res.send("done thnc");
 });
 
 router.delete("/", [auth, admin], async (req, res) => {
