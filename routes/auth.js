@@ -14,9 +14,7 @@ authrouter.route("/").post(async (req, res) => {
     return res.status(400).send("Invalid E-mail or Password.");
   } else {
     if (!user.isVerified) {
-      res
-        .status(400)
-        .send("User is not verified. Kindly verify and try login later.");
+      res.status(400).send("user.email is not verified");
     } else {
       const validPassword = await bcrypt.compare(
         req.body.password,
