@@ -33,7 +33,7 @@ router.get("/:hall", async (req, res) => {
   res.send(foodItems);
 });
 
-router.post("/", upload.single("image"), async (req, res) => {
+router.post("/", [auth, admin, upload.single("image")], async (req, res) => {
   //const { error } = validate(req.body);
   //if (error) return res.status(400).send(error.details[0].message);
   //let foodItem = new FoodItem(req.body);
