@@ -25,12 +25,13 @@ userrouter.route("/me").get(auth, async (req, res) => {
 const otp = require("../middleware/otpgenerate");
 userrouter.post("/register", upload.single("image"), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
-
-  if (user) {
-    res.status(400).send("user already registered");
+  console.log(user);
+  if (user && user.isVerified) {
+    res.status(400).send("User is already registered");
   } else {
     var OTP = otp();
     console.log(OTP);
+    if (user) user.remove();
 
     try {
       const fileStr = req.file.path;

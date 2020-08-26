@@ -3,6 +3,7 @@ const HistorySchema = require("../models/RegisterSchema");
 const router = express.Router();
 const { FoodItem } = require("../models/foodItem");
 const { findById } = require("../models/RegisterSchema");
+const { array } = require("joi");
 
 router.get("/history", async (req, res) => {
   const foodItems = await HistorySchema.find();
@@ -25,8 +26,7 @@ router.post("/history", async (req, res) => {
     time,
     totalPrice,
   } = req.body;
-
-  user.history.push({
+  user.history.unshift({
     hall,
     isDineIn,
     items,
