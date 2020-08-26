@@ -7,7 +7,6 @@ const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 require("dotenv").config();
 const mail = require("../middleware/mail");
-//muler
 const multer = require("multer");
 const upload = multer({ dest: "upload/" });
 
@@ -23,6 +22,7 @@ userrouter.route("/me").get(auth, async (req, res) => {
   res.send(user);
 });
 const otp = require("../middleware/otpgenerate");
+const { response } = require("express");
 userrouter.post("/register", upload.single("image"), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   console.log(user);
@@ -38,7 +38,7 @@ userrouter.post("/register", upload.single("image"), async (req, res) => {
       const uploadResponse = await cloudinary.uploader.upload(fileStr, {
         folder: "Users",
       });
-      console.log(uploadResponse.url);
+      console.log(uploadResponse);
       user = new User(
         Object.assign(
           _.pick(req.body, [
@@ -88,6 +88,31 @@ userrouter.put("/register/delete", async (req, res) => {
     console.log(err);
   }
 });
+
+userrouter.delete("/register/delete", async (req, res) => {
+  const a = await User.deleteMany();
+  res.send(a);
+});
+
+userrouter.put("/register", upload.single("image"), async (req, res) => {
+  const fileStr = req.file.path;
+  const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+    folder: "Users",
+  });
+  console.log(uploadResponse);
+  const user = await User.findOneAndUpdate(
+    { email: req.body.email },
+    {
+      mobile: req.body.mobile,
+      imagePath: uploadResponse.url,
+    }
+  );
+  console.log(user);
+  // if (!foodItem)
+  //   return res.status(404).send("The item with the given ID was not found.");
+  res.send(user);
+});
+
 // "confirmPassword": "gggggggg",
 // "email": "a@f.com",
 // "hall": "13",

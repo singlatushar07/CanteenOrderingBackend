@@ -15,11 +15,15 @@ cloudinary.config({
   api_secret: "YWc1GhUuPcOFDGapf-mhpGWo6co",
 });
 
-router.get("/", async (req, res) => {
-  const foodItems = await FoodItem.find().sort("hall");
-  console.log(foodItems);
-  res.send(foodItems);
-});
+// router.get("/", async (req, res) => {
+//   const foodItems = await FoodItem.find().sort("hall");
+//   let arr = [];
+//   for (let i = 0; i < foodItems.length; i++) {
+//     arr.push(foodItems[i].hall);
+//   }
+//   arr = [...new Set(arr)];
+//   res.send(arr);
+// });
 
 router.get("/:hall", async (req, res) => {
   const foodItems = await FoodItem.find({ hall: req.params.hall }).sort(
