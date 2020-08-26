@@ -8,7 +8,7 @@ const auth = require("../middleware/auth");
 require("dotenv").config();
 const mail = require("../middleware/mail");
 const multer = require("multer");
-const upload = multer({ dest: "upload/" });
+const upload = multer({ dest: "/tmp/upload/" });
 
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
@@ -55,10 +55,8 @@ userrouter.post("/register", upload.single("image"), async (req, res) => {
           }
         )
       );
-      //res.json({ msg: "yaya" });
     } catch (err) {
       console.error(err);
-      // res.status(500).json({ err: 'Something went wrong' });
     }
 
     user.otp = OTP;
@@ -69,10 +67,7 @@ userrouter.post("/register", upload.single("image"), async (req, res) => {
     mail(user.name, OTP, user.email);
 
     const token = user.generateAuthToken();
-    res
-      .header("x-auth-token", token)
-      .status(200)
-      .send(_.pick(user, ["_id", "email", "name"]));
+    res.status(200).send(_.pick(user, ["_id", "email", "name"]));
   }
 });
 userrouter.put("/register/delete", async (req, res) => {
@@ -108,17 +103,8 @@ userrouter.put("/register", upload.single("image"), async (req, res) => {
     }
   );
   console.log(user);
-  // if (!foodItem)
-  //   return res.status(404).send("The item with the given ID was not found.");
+
   res.send(user);
 });
-
-// "confirmPassword": "gggggggg",
-// "email": "a@f.com",
-// "hall": "13",
-// "name": "Fr",
-// "password": "gggggggg",
-// "rollNo": "",
-// "room": "Vg",
 
 module.exports = userrouter;

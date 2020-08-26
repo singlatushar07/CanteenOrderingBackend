@@ -16,7 +16,7 @@ router.post("/history", async (req, res) => {
 
   console.log(req.body);
 
-  console.log(user);
+  
   const {
     hall,
     isDineIn,
@@ -34,7 +34,8 @@ router.post("/history", async (req, res) => {
     room,
     totalPrice,
   });
-
+  if (payment_method == "account") user.Pending = user.Pending + totalPrice;
+  console.log(user);
   await user.save();
   res.status(200).send(user);
 });

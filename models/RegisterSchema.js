@@ -5,15 +5,7 @@ const jwt = require("jsonwebtoken");
 const { number, string } = require("joi");
 require("dotenv").config();
 
-// const itemschema = new Schema({
-//   id: {
-//     type: String,
-//   },
-//   quantity: {
-//     type: Number,
-//     required: true,
-//   },
-// });
+
 const HistorySchema = new Schema({
   hall: {
     type: Number,
@@ -86,10 +78,14 @@ const RegisterSchema = new Schema({
   },
   mobile: {
     type: String,
-    default: "4676676767",
+    default: "",
   },
   imagePath: {
     type: String,
+  },
+  Pending: {
+    type: Number,
+    default: 0,
   },
   history: [HistorySchema],
 });

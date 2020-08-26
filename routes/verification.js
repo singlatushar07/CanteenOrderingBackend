@@ -13,11 +13,8 @@ const { getMaxListeners } = require("npm");
 const mail = require("../middleware/mail");
 
 verificationrouter.post("/verify", async (req, res) => {
-  console.log(req.body);
-  // res.send(JSON.stringify(req.body));
-
   let user = await User.findById(req.body.id);
-  console.log(user);
+  console.log(req.body);
   if (!user) {
     res.status(400).send("User Not Found. Firstly Register Yourself");
   } else {
@@ -40,15 +37,7 @@ verificationrouter.post("/verify/resend", async (req, res) => {
   mail(user.name, user.otp, user.email);
 
   const token = user.generateAuthToken();
-  res.status(200).send("done");
+  res.status(200).send("Check your inbox for otp.");
 });
-
-// "confirmPassword": "gggggggg",
-// "email": "a@f.com",
-// "hall": "13",
-// "name": "Fr",
-// "password": "gggggggg",
-// "rollNo": "",
-// "room": "Vg",
 
 module.exports = verificationrouter;
