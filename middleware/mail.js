@@ -21,7 +21,7 @@ module.exports = function (name, otp, email) {
 
   transporter.sendMail(mailOptions, (err, data) => {
     if (err) {
-      return console.log("Error occurs", err);
+      return console.log("Error Occured while sendimg email.", err);
     }
     return console.log("Email sent!!!");
   });

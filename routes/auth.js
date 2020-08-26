@@ -6,8 +6,6 @@ const { json } = require("body-parser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 authrouter.route("/").post(async (req, res) => {
-  console.log(req.body);
-
   let user = await User.findOne({ email: req.body.email });
   console.log(user);
   if (!user) {

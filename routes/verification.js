@@ -33,7 +33,6 @@ verificationrouter.post("/verify/resend", async (req, res) => {
   console.log(req.body);
   let user = await User.findById(req.body.id);
 
-  console.log(user._id);
   mail(user.name, user.otp, user.email);
 
   const token = user.generateAuthToken();

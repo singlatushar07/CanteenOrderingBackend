@@ -38,7 +38,7 @@ userrouter.post("/register", upload.single("image"), async (req, res) => {
       const uploadResponse = await cloudinary.uploader.upload(fileStr, {
         folder: "Users",
       });
-      console.log(uploadResponse);
+      console.log(uploadResponse.url);
       user = new User(
         Object.assign(
           _.pick(req.body, [
