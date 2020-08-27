@@ -29,7 +29,7 @@ userrouter.post("/register", upload.single("image"), async (req, res) => {
   if (user && user.isVerified) {
     res.status(400).send("User is already registered");
   } else {
-    var OTP = otp();
+    const OTP = otp();
     console.log(OTP);
     if (user) user.remove();
 
@@ -105,6 +105,39 @@ userrouter.put("/register", upload.single("image"), async (req, res) => {
   console.log(user);
 
   res.send(user);
+});
+
+userrouter.put("/register/changepassword", async (req, res) => {
+  const user = await User.findOneAndUpdate(
+    { email: req.body.email },
+    {
+      mobile: req.body.mobile,
+      imagePath: uploadResponse.url,
+    }
+  );
+  console.log(user);
+
+  res.send(user);
+});
+
+userrouter.post("/register/forget", async (req, res) => {
+  const OTP = otp();
+  console.log(OTP);
+  const user = await User.findOneAndUpdate(
+    { email: req.body.email },
+    {
+      otp: OTP,
+      isVerified: false,
+    }
+  );
+  if (user) {
+    mail(user.name, OTP, user.email);
+  } else {
+    return res.status(404).send("User not found");
+  }
+  const response = _.pick(user, ["name", "_id", "email"]);
+  response.isChangePassword = true;
+  res.send(response);
 });
 
 module.exports = userrouter;

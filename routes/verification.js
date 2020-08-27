@@ -39,4 +39,25 @@ verificationrouter.post("/verify/resend", async (req, res) => {
   res.status(200).send("Check your inbox for otp.");
 });
 
+verificationrouter.post("/verify/forget", async (req, res) => {
+  let user = await User.findById(req.body.id);
+  console.log(req.body);
+  if (!user) {
+    res.status(400).send("User Not Found. Firstly Register Yourself");
+  } else {
+    if (user.otp == req.body.otp) {
+      user.isVerified = true;
+      user.otp = null;
+      await user.save();
+      const token = user.generateAuthToken();
+      user = user.toObject();
+      user.isChangePassword = true;
+      console.log("gfhjf", user);
+      res.header("x-auth-token", token).status(200).send(JSON.stringify(user));
+    } else {
+      res.status(401).send(JSON.stringify({ isVerified: false }));
+    }
+  }
+});
+
 module.exports = verificationrouter;
