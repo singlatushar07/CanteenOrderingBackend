@@ -59,4 +59,20 @@ verificationrouter.post("/verify/forget", async (req, res) => {
   }
 });
 
+verificationrouter.put("/verify/forget", async (req, res) => {
+  let user = await User.findById(req.body.id);
+  let token = req.body.token;
+  const newPassword = req.body.newPassword;
+  try {
+    const decoded = jwt.verify(token, "nikhil");
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+    res.send("Successfully changed password");
+    console.log(user);
+  } catch (ex) {
+    res.status(400).send("Invalid Token");
+  }
+});
+
 module.exports = verificationrouter;
