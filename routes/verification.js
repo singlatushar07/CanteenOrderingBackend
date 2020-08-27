@@ -46,7 +46,6 @@ verificationrouter.post("/verify/forget", async (req, res) => {
     res.status(400).send("User Not Found. Firstly Register Yourself");
   } else {
     if (user.otp == req.body.otp) {
-      user.isVerified = true;
       user.otp = null;
       await user.save();
       const token = user.generateAuthToken();

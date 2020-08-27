@@ -127,7 +127,6 @@ userrouter.post("/register/forget", async (req, res) => {
     { email: req.body.email },
     {
       otp: OTP,
-      isVerified: false,
     }
   );
   if (user) {
