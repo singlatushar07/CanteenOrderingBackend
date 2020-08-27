@@ -1,7 +1,6 @@
 const express = require("express");
 const authrouter = express.Router();
 const User = require("../models/RegisterSchema");
-const { json } = require("body-parser");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");

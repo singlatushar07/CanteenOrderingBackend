@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const { number, string } = require("joi");
 require("dotenv").config();
 
-
 const HistorySchema = new Schema({
   hall: {
     type: Number,
@@ -86,6 +85,10 @@ const RegisterSchema = new Schema({
   Pending: {
     type: Number,
     default: 0,
+  },
+  expoNotificationToken: {
+    type: String,
+    default: null,
   },
   history: [HistorySchema],
 });

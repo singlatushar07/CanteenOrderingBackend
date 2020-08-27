@@ -2,9 +2,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const menurouter = require("./routes/foodItems");
 const userroute = require("./routes/RegisterUser");
+const notificationRouter = require("./routes/expoPushNotifications");
 const auth = require("./routes/auth");
 const app = express();
 const verificationrouter = require("./routes/verification");
+const authMiddleware = require("./middleware/auth");
 require("dotenv").config();
 const history = require("./routes/history");
 process.env.SUPRESS_NO_CONFIG_WARNING = "y";
@@ -23,11 +25,12 @@ mongoose
   )
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.error("Could not connect to MongoDB...", err));
-
+app.use("/expoPushTokens", authMiddleware);
 app.use(express.json());
 app.use("/", history);
 app.use("/auth", auth);
 app.use("/menu", menurouter);
+app.use("/expoPushTokens", notificationRouter);
 app.use("/", userroute);
 app.use("/", verificationrouter);
 
