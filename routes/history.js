@@ -4,6 +4,7 @@ const router = express.Router();
 const { FoodItem } = require("../models/foodItem");
 const { findById } = require("../models/RegisterSchema");
 const { array } = require("joi");
+const Admin = require("../models/AdminSchema");
 
 router.get("/history", async (req, res) => {
   const foodItems = await HistorySchema.find();
@@ -18,16 +19,15 @@ router.post("/history", async (req, res) => {
 
   const {
     hall,
-    isDineIn,
+    isDelivery,
     payment_method,
     room,
     items,
-    time,
     totalPrice,
   } = req.body;
   user.history.unshift({
     hall,
-    isDineIn,
+    isDelivery,
     items,
     payment_method,
     room,
@@ -36,7 +36,23 @@ router.post("/history", async (req, res) => {
   if (payment_method == "account") user.Pending = user.Pending + totalPrice;
   console.log(user);
   await user.save();
-  res.status(200).send(user);
+  try {
+    console.log(typeof hall);
+    let admin = await Admin.findOne({ hall: hall });
+    console.log(admin);
+    admin.history.unshift({
+      isDelivery,
+      items,
+      payment_method,
+      room,
+      totalPrice,
+    });
+    await admin.save();
+    res.status(200).send(user);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send("error occured");
+  }
 });
 
 router.get("/history/:id", async (req, res) => {
