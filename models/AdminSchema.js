@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 const jwt = require("jsonwebtoken");
-const { number, string } = require("joi");
 require("dotenv").config();
 
 const HistorySchema = new Schema({
@@ -23,13 +22,25 @@ const HistorySchema = new Schema({
   },
   time: {
     type: Date,
-    default: Date.now,
+    default: Date.now(),
   },
   totalPrice: {
     type: Number,
   },
+  orderStatus: {
+    type: Number,
+    //   0: pending action
+    //   1: accepted but yet to be fulfilled
+    //   2: accepted and fulfilled
+    //   3: rejected
+  },
 });
-const RegisterSchema = new Schema({
+const AdminSchema = new Schema({
+  hall: {
+    type: String,
+    required: true,
+  },
+
   email: {
     type: String,
     required: true,
@@ -44,11 +55,6 @@ const RegisterSchema = new Schema({
     type: String,
     required: true,
   },
-
-  isAdmin: {
-    type: Boolean,
-  },
-
   mobile: {
     type: String,
     default: "",
@@ -56,25 +62,19 @@ const RegisterSchema = new Schema({
   imagePath: {
     type: String,
   },
-  Pending: {
-    type: Number,
-    default: 0,
-  },
-  hall: {
+  expoNotificationToken: {
     type: String,
-    required: true,
+    default: null,
   },
   history: [HistorySchema],
 });
 
-RegisterSchema.methods.generateAuthToken = function () {
+AdminSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
     {
       _id: this._id,
-      isAdmin: this.isAdmin,
       name: this.name,
       email: this.email,
-      isVerified: this.isVerified,
       hall: this.hall,
       mobile: this.mobile,
       imagePath: this.imagePath,
@@ -84,6 +84,6 @@ RegisterSchema.methods.generateAuthToken = function () {
   return token;
 };
 
-var Admin = mongoose.model("Admin", RegisterSchema);
+var Admin = mongoose.model("Admin", AdminSchema);
 
 module.exports = Admin;
