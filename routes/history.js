@@ -16,7 +16,6 @@ router.post("/history", async (req, res) => {
 
   console.log(req.body);
 
-  
   const {
     hall,
     isDineIn,
@@ -54,5 +53,38 @@ router.get("/history/:id", async (req, res) => {
   }
 
   res.send(user.history);
+});
+
+router.get("/:id/fetch-paginated-data", async (req, res) => {
+  var pageNo = parseInt(req.query.pageNo);
+  var pageSize = parseInt(req.query.pageSize);
+  var user = await HistorySchema.findById(req.params.id);
+  user = user.history;
+  //checking if page number is invalid
+  if (pageNo <= 0) {
+    var response = {
+      success: false,
+      message: "Invalid Page Number",
+    };
+    return res.status(200).json(response);
+  } else {
+    //fetch data from database based on given page no and page size
+    var index = parseInt(pageNo - 1) * parseInt(pageSize) + 1;
+    var list = [];
+    console.log(user.length);
+    for (var i = 0; i < pageSize; i++) {
+      if (index > user.length) break;
+      list.push(
+       user[index-1],
+      );
+      index++;
+    }
+    console.log(list);
+    var response = {
+      success: true,
+      list: list,
+    };
+    return res.status(200).json(response);
+  }
 });
 module.exports = router;
