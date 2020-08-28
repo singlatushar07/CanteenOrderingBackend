@@ -22,8 +22,8 @@ userrouter.route("/me").get(auth, async (req, res) => {
   res.send(user);
 });
 const otp = require("../middleware/otpgenerate");
-const { response } = require("express");
-userrouter.post("/register", upload.single("image"), async (req, res) => {
+
+userrouter.post("/user/register", upload.single("image"), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   console.log(user);
   if (user && user.isVerified) {
