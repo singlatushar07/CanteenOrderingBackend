@@ -74,11 +74,17 @@ router.get("/:id/fetch-paginated-data", async (req, res) => {
     console.log(user.length);
     for (var i = 0; i < pageSize; i++) {
       if (index > user.length) break;
-      list.push(
-       user[index-1],
-      );
+      for (var j = 0; j < user[index - 1].items.length; j++) {
+        let item = await FoodItem.findById(
+          user[index - 1].items[j].id
+        ).map((item) => item.toObject());
+        item.quantity = user[index - 1].items[j].quantity;
+        user[index - 1].items[j] = item;
+      }
+      list.push(user[index - 1]);
       index++;
     }
+
     console.log(list);
     var response = {
       success: true,
