@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const HistorySchema = new Schema({
-  isDineIn: {
+  isDelivery: {
     type: Boolean,
   },
   items: {
