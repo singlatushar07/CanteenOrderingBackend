@@ -22,8 +22,8 @@ userrouter.route("/me").get(auth, async (req, res) => {
   res.send(user);
 });
 const otp = require("../middleware/otpgenerate");
-
-userrouter.post("/register", upload.single("image"), async (req, res) => {
+const Admin = require("../models/AdminSchema");
+userrouter.post("/user/register", upload.single("image"), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   console.log(user);
   if (user && user.isVerified) {
@@ -138,6 +138,7 @@ userrouter.post("/register/forget", async (req, res) => {
   response.isChangePassword = true;
   res.send(response);
 });
+
 userrouter.post("/admin/register", upload.single("image"), async (req, res) => {
   let user = await Admin.findOne({ email: req.body.email });
   console.log(user);
@@ -155,11 +156,23 @@ userrouter.post("/admin/register", upload.single("image"), async (req, res) => {
           _.pick(req.body, ["hall", "email", "name", "password", "mobile"]),
           {
             imagePath: uploadResponse.url,
-         }
+          }
         )
-     );
+      );
     } catch (err) {
-    console.error(err);
+      console.error(err);
     }
+
+    
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+    await user.save();
+    console.log(user);
+    
+
+    const token = user.generateAuthToken();
+    res.status(200).send(_.pick(user, ["_id", "email", "name"]));
+  }
+});
 
 module.exports = userrouter;
