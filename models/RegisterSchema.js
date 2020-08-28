@@ -11,7 +11,7 @@ const HistorySchema = new Schema({
     required: true,
   },
 
-  isDineIn: {
+  isDelivery: {
     type: Boolean,
   },
   items: {
