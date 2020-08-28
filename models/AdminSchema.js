@@ -29,7 +29,8 @@ const HistorySchema = new Schema({
   },
   orderStatus: {
     type: Number,
-    default : 0,
+    default: 0,
+
     //   0: pending action
     //   1: accepted but yet to be fulfilled
     //   2: accepted and fulfilled
