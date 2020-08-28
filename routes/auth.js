@@ -1,7 +1,6 @@
 const express = require("express");
 const authrouter = express.Router();
 const User = require("../models/RegisterSchema");
-
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 authrouter.route("/").post(async (req, res) => {
