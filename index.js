@@ -28,7 +28,7 @@ mongoose
 app.use("/expoPushTokens", authMiddleware);
 app.use(express.json());
 app.use("/", history);
-app.use("/auth", auth);
+app.use("/", auth);
 app.use("/menu", menurouter);
 app.use("/expoPushTokens", notificationRouter);
 app.use("/", userroute);
