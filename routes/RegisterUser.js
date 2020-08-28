@@ -23,7 +23,7 @@ userrouter.route("/me").get(auth, async (req, res) => {
 });
 const otp = require("../middleware/otpgenerate");
 
-userrouter.post("/user/register", upload.single("image"), async (req, res) => {
+userrouter.post("/register", upload.single("image"), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   console.log(user);
   if (user && user.isVerified) {
@@ -138,5 +138,28 @@ userrouter.post("/register/forget", async (req, res) => {
   response.isChangePassword = true;
   res.send(response);
 });
+userrouter.post("/admin/register", upload.single("image"), async (req, res) => {
+  let user = await Admin.findOne({ email: req.body.email });
+  console.log(user);
+  if (user) {
+    res.status(400).send("User is already registered");
+  } else {
+    try {
+      const fileStr = req.file.path;
+      const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+        folder: "Admins",
+      });
+      console.log(uploadResponse.url);
+      user = new Admin(
+        Object.assign(
+          _.pick(req.body, ["hall", "email", "name", "password", "mobile"]),
+          {
+            imagePath: uploadResponse.url,
+         }
+        )
+     );
+    } catch (err) {
+    console.error(err);
+    }
 
 module.exports = userrouter;
