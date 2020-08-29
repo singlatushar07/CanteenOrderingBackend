@@ -36,6 +36,14 @@ const HistorySchema = new Schema({
   quantity: {
     type: Number,
   },
+  orderStatus: {
+    type: Number,
+    default: 0,
+    //   0: pending action
+    //   1: accepted but yet to be fulfilled
+    //   2: accepted and fulfilled
+    //   3: rejected
+  },
 });
 const RegisterSchema = new Schema({
   hall: {

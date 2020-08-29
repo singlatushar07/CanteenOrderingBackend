@@ -4,6 +4,7 @@ const router = express.Router();
 const { FoodItem } = require("../models/foodItem");
 const Admin = require("../models/AdminSchema");
 const sendNotification = require("../utility/sendNotification");
+const userrouter = require("./RegisterUser");
 
 router.get("/history", async (req, res) => {
   const foodItems = await User.find();
@@ -23,6 +24,7 @@ router.post("/user/history", async (req, res) => {
     room,
     items,
     totalPrice,
+    userId,
   } = req.body;
   user.history.unshift({
     hall,
@@ -35,16 +37,18 @@ router.post("/user/history", async (req, res) => {
   if (payment_method == "account") user.Pending = user.Pending + totalPrice;
   console.log(user);
   await user.save();
+  const _id = user.history[0]._id;
   try {
-    console.log(typeof hall);
     let admin = await Admin.findOne({ hall: hall });
     console.log(admin);
-    admin.history.unshift({
+    admin.pending.unshift({
       isDelivery,
       items,
       payment_method,
       room,
       totalPrice,
+      userId,
+      _id,
     });
     await admin.save();
     const token = admin.expoNotificationToken;
@@ -109,5 +113,53 @@ router.get("/user/:id/fetch-paginated-data", async (req, res) => {
     };
     return res.status(200).json(response);
   }
+});
+
+router.get("/admin/pending/:id", async (req, res) => {
+  var orderStatus = parseInt(req.query.orderStatus);
+  var orderId = req.query.orderId;
+
+  var user = await Admin.findById(req.params.id);
+
+  function findIndexandData(c, arr) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i]._id == orderId) {
+        var order = { data: arr[i], index: i };
+
+        return order;
+      }
+    }
+  }
+
+  var order = findIndexandData(orderId, user.pending);
+
+  order.data.orderStatus = orderStatus;
+
+  user.history.unshift(order.data);
+  user.pending.splice(order.index, 1);
+
+  await user.save();
+  var customer = await User.findById(user.history[0].userId);
+  customerorder = findIndexandData(orderId, customer.history);
+  customerorder.data.orderStatus = orderStatus;
+  await customer.save();
+  res.send("order status changed as per your choice");
+});
+
+router.get("/admin/pendingOrders/:id", async (req, res) => {
+  const user = await Admin.findById(req.params.id);
+  console.log(req.params.id);
+  console.log(user);
+  for (var i = 0; i < user.pending.length; i++) {
+    for (var j = 0; j < user.pending[i].items.length; j++) {
+      let item = await FoodItem.findById(
+        user.pending[i].items[j].id
+      ).map((item) => item.toObject());
+      item.quantity = user.pending[i].items[j].quantity;
+      user.pending[i].items[j] = item;
+    }
+  }
+
+  res.send(user.pending);
 });
 module.exports = router;

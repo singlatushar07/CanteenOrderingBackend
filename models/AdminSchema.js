@@ -5,6 +5,9 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const HistorySchema = new Schema({
+  userId: {
+    type: String,
+  },
   isDelivery: {
     type: Boolean,
   },
@@ -32,9 +35,8 @@ const HistorySchema = new Schema({
     default: 0,
 
     //   0: pending action
-    //   1: accepted but yet to be fulfilled
-    //   2: accepted and fulfilled
-    //   3: rejected
+    //   1: rejected
+    //   2: accepted
   },
 });
 const AdminSchema = new Schema({
@@ -69,6 +71,7 @@ const AdminSchema = new Schema({
     default: null,
   },
   history: [HistorySchema],
+  pending: [HistorySchema],
 });
 
 AdminSchema.methods.generateAuthToken = function () {
