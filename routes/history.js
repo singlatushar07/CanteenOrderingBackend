@@ -3,6 +3,7 @@ const User = require("../models/RegisterSchema");
 const router = express.Router();
 const { FoodItem } = require("../models/foodItem");
 const Admin = require("../models/AdminSchema");
+const sendNotification = require("../utility/sendNotification");
 
 router.get("/history", async (req, res) => {
   const foodItems = await User.find();
@@ -46,6 +47,8 @@ router.post("/user/history", async (req, res) => {
       totalPrice,
     });
     await admin.save();
+    const token = admin.expoNotificationToken;
+    sendNotification(token, "Successful", "Your order is placed");
     res.status(200).send(user);
   } catch (error) {
     console.log(error);
