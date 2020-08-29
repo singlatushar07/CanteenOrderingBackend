@@ -23,39 +23,29 @@ router.get("/user/menu/:hall", async (req, res) => {
   res.send(foodItems);
 });
 
-router.post(
-  "/menu",
-  [auth, admin, upload.single("image")],
-  async (req, res) => {
-    console.log(req.file, req.body);
-    try {
-      const fileStr = req.file.path;
-      console.log(req.file.path);
-      const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-        folder: `foodItems/hall${req.body.hall}`,
-      });
-      console.log(uploadResponse.url);
-      const foodItem = new FoodItem(
-        Object.assign(
-          _.pick(req.body, [
-            "title",
-            "hall",
-            "description",
-            "category",
-            "price",
-          ]),
-          {
-            image: uploadResponse.url,
-          }
-        )
-      );
-      await foodItem.save();
-    } catch (err) {
-      console.error(err);
-      // res.status(500).send(json({ err: 'Something went wrong' });
-    }
+router.post("/menu", [upload.single("image")], async (req, res) => {
+  console.log(req.file, req.body);
+  try {
+    const fileStr = req.file.path;
+    console.log(req.file.path);
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+      folder: `foodItems/hall${req.body.hall}`,
+    });
+    console.log(uploadResponse.url);
+    const foodItem = new FoodItem(
+      Object.assign(
+        _.pick(req.body, ["title", "hall", "description", "category", "price"]),
+        {
+          image: uploadResponse.url,
+        }
+      )
+    );
+    await foodItem.save();
+  } catch (err) {
+    console.error(err);
+    // res.status(500).send(json({ err: 'Something went wrong' });
   }
-);
+});
 
 router.delete("/menu", [auth, admin], async (req, res) => {
   const a = await FoodItem.deleteMany();
@@ -71,7 +61,7 @@ router.delete("/menu/:id", [auth, admin], async (req, res) => {
   res.send(foodItem);
 });
 
-router.put("/menu/:id", [auth, admin], async (req, res) => {
+router.put("/menu/:id", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 

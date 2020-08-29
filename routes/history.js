@@ -116,34 +116,38 @@ router.get("/user/:id/fetch-paginated-data", async (req, res) => {
 });
 
 router.get("/admin/pending/:id", async (req, res) => {
-  var orderStatus = parseInt(req.query.orderStatus);
-  var orderId = req.query.orderId;
+ // try {
+    var orderStatus = parseInt(req.query.orderStatus);
+    var orderId = req.query.orderId;
 
-  var user = await Admin.findById(req.params.id);
+    var user = await Admin.findById(req.params.id);
 
-  function findIndexandData(c, arr) {
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i]._id == orderId) {
-        var order = { data: arr[i], index: i };
+    function findIndexandData(c, arr) {
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i]._id == orderId) {
+          var order = { data: arr[i], index: i };
 
-        return order;
+          return order;
+        }
       }
     }
-  }
 
-  var order = findIndexandData(orderId, user.pending);
+    var order = findIndexandData(orderId, user.pending);
 
-  order.data.orderStatus = orderStatus;
+    order.data.orderStatus = orderStatus;
 
-  user.history.unshift(order.data);
-  user.pending.splice(order.index, 1);
+    user.history.unshift(order.data);
+    user.pending.splice(order.index, 1);
 
-  await user.save();
-  var customer = await User.findById(user.history[0].userId);
-  customerorder = findIndexandData(orderId, customer.history);
-  customerorder.data.orderStatus = orderStatus;
-  await customer.save();
-  res.send("order status changed as per your choice");
+    await user.save();
+    var customer = await User.findById(user.history[0].userId);
+    customerorder = findIndexandData(orderId, customer.history);
+    customerorder.data.orderStatus = orderStatus;
+    await customer.save();
+    res.send("order confirmed");
+  // } catch (err) {
+  //   res.status(400).send(JSON.parse("Error Occured"));
+  // }
 });
 
 router.get("/admin/pendingOrders/:id", async (req, res) => {
