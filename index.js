@@ -25,12 +25,12 @@ mongoose
   )
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.error("Could not connect to MongoDB...", err));
-app.use("/expoPushTokens", authMiddleware);
+app.use("/user/expoPushTokens", authMiddleware);
 app.use(express.json());
 app.use("/", history);
 app.use("/", auth);
-app.use("/menu", menurouter);
-app.use("/expoPushTokens", notificationRouter);
+app.use("/", menurouter);
+app.use("/", notificationRouter);
 app.use("/", userroute);
 app.use("/", verificationrouter);
 

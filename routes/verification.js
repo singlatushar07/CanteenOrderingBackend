@@ -12,7 +12,7 @@ const nodemailer = require("nodemailer");
 const { getMaxListeners } = require("npm");
 const mail = require("../middleware/mail");
 
-verificationrouter.post("/verify", async (req, res) => {
+verificationrouter.post("/user/verify", async (req, res) => {
   let user = await User.findById(req.body.id);
   console.log(req.body);
   if (!user) {
@@ -29,7 +29,7 @@ verificationrouter.post("/verify", async (req, res) => {
     }
   }
 });
-verificationrouter.post("/verify/resend", async (req, res) => {
+verificationrouter.post("/user/verify/resend", async (req, res) => {
   console.log(req.body);
   let user = await User.findById(req.body.id);
 
@@ -39,7 +39,7 @@ verificationrouter.post("/verify/resend", async (req, res) => {
   res.status(200).send("Check your inbox for otp.");
 });
 
-verificationrouter.post("/verify/forget", async (req, res) => {
+verificationrouter.post("/user/verify/forget", async (req, res) => {
   let user = await User.findById(req.body.id);
   console.log(req.body);
   if (!user) {
@@ -59,7 +59,7 @@ verificationrouter.post("/verify/forget", async (req, res) => {
   }
 });
 
-verificationrouter.put("/verify/forget", async (req, res) => {
+verificationrouter.put("/user/verify/forget", async (req, res) => {
   let user = await User.findById(req.body.id);
   let token = req.body.token;
   const newPassword = req.body.newPassword;

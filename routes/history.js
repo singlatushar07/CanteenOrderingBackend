@@ -1,19 +1,17 @@
 const express = require("express");
-const HistorySchema = require("../models/RegisterSchema");
+const User = require("../models/RegisterSchema");
 const router = express.Router();
 const { FoodItem } = require("../models/foodItem");
-const { findById } = require("../models/RegisterSchema");
-const { array } = require("joi");
 const Admin = require("../models/AdminSchema");
 
 router.get("/history", async (req, res) => {
-  const foodItems = await HistorySchema.find();
+  const foodItems = await User.find();
   console.log(foodItems);
   res.send(foodItems);
 });
 
-router.post("/history", async (req, res) => {
-  let user = await HistorySchema.findOne({ _id: req.body.userId });
+router.post("/user/history", async (req, res) => {
+  let user = await User.findOne({ _id: req.body.userId });
 
   console.log(req.body);
 
@@ -55,8 +53,8 @@ router.post("/history", async (req, res) => {
   }
 });
 
-router.get("/history/:id", async (req, res) => {
-  const user = await HistorySchema.findById(req.params.id);
+router.get("/user/history/:id", async (req, res) => {
+  const user = await User.findById(req.params.id);
 
   for (var i = 0; i < user.history.length; i++) {
     for (var j = 0; j < user.history[i].items.length; j++) {
@@ -71,10 +69,10 @@ router.get("/history/:id", async (req, res) => {
   res.send(user.history);
 });
 
-router.get("/:id/fetch-paginated-data", async (req, res) => {
+router.get("/user/:id/fetch-paginated-data", async (req, res) => {
   var pageNo = parseInt(req.query.pageNo);
   var pageSize = parseInt(req.query.pageSize);
-  var user = await HistorySchema.findById(req.params.id);
+  var user = await User.findById(req.params.id);
   user = user.history;
   //checking if page number is invalid
   if (pageNo <= 0) {

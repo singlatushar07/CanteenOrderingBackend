@@ -70,7 +70,7 @@ userrouter.post("/user/register", upload.single("image"), async (req, res) => {
     res.status(200).send(_.pick(user, ["_id", "email", "name"]));
   }
 });
-userrouter.put("/register/delete", async (req, res) => {
+userrouter.put("/user/register/delete", async (req, res) => {
   console.log(req.body.id);
 
   try {
@@ -84,12 +84,12 @@ userrouter.put("/register/delete", async (req, res) => {
   }
 });
 
-userrouter.delete("/register/delete", async (req, res) => {
+userrouter.delete("/user/register/delete", async (req, res) => {
   const a = await User.deleteMany();
   res.send(a);
 });
 
-userrouter.put("/register", upload.single("image"), async (req, res) => {
+userrouter.put("/user/register", upload.single("image"), async (req, res) => {
   const fileStr = req.file.path;
   const uploadResponse = await cloudinary.uploader.upload(fileStr, {
     folder: "Users",
@@ -120,7 +120,7 @@ userrouter.put("/register/changepassword", async (req, res) => {
   res.send(user);
 });
 
-userrouter.post("/register/forget", async (req, res) => {
+userrouter.post("/user/register/forget", async (req, res) => {
   const OTP = otp();
   console.log(OTP);
   const user = await User.findOneAndUpdate(
@@ -163,12 +163,10 @@ userrouter.post("/admin/register", upload.single("image"), async (req, res) => {
       console.error(err);
     }
 
-    
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     await user.save();
     console.log(user);
-    
 
     const token = user.generateAuthToken();
     res.status(200).send(_.pick(user, ["_id", "email", "name"]));
