@@ -8,14 +8,11 @@ const userrouter = require("./RegisterUser");
 
 router.get("/history", async (req, res) => {
   const foodItems = await User.find();
-  console.log(foodItems);
   res.send(foodItems);
 });
 
 router.post("/user/history", async (req, res) => {
   let user = await User.findOne({ _id: req.body.userId });
-
-  console.log(req.body);
 
   const {
     hall,
@@ -35,12 +32,10 @@ router.post("/user/history", async (req, res) => {
     totalPrice,
   });
   if (payment_method == "account") user.Pending = user.Pending + totalPrice;
-  console.log(user);
   await user.save();
   const _id = user.history[0]._id;
   try {
     let admin = await Admin.findOne({ hall: hall });
-    console.log(admin);
     admin.pending.unshift({
       isDelivery,
       items,
@@ -52,7 +47,11 @@ router.post("/user/history", async (req, res) => {
     });
     await admin.save();
     const token = admin.expoNotificationToken;
-    sendNotification(token, "Successful", "Your order is placed");
+    sendNotification(
+      token,
+      "New Order",
+      `A new order is placed by ${user.name}`
+    );
     res.status(200).send(user);
   } catch (error) {
     console.log(error);
@@ -92,7 +91,6 @@ router.get("/user/:id/fetch-paginated-data", async (req, res) => {
     //fetch data from database based on given page no and page size
     var index = parseInt(pageNo - 1) * parseInt(pageSize) + 1;
     var list = [];
-    console.log(user.length);
     for (var i = 0; i < pageSize; i++) {
       if (index > user.length) break;
       for (var j = 0; j < user[index - 1].items.length; j++) {
@@ -106,7 +104,6 @@ router.get("/user/:id/fetch-paginated-data", async (req, res) => {
       index++;
     }
 
-    console.log(list);
     var response = {
       success: true,
       list: list,
@@ -116,35 +113,43 @@ router.get("/user/:id/fetch-paginated-data", async (req, res) => {
 });
 
 router.get("/admin/pending/:id", async (req, res) => {
- // try {
-    var orderStatus = parseInt(req.query.orderStatus);
-    var orderId = req.query.orderId;
+  // try {
+  var orderStatus = parseInt(req.query.orderStatus);
+  var orderId = req.query.orderId;
 
-    var user = await Admin.findById(req.params.id);
-
-    function findIndexandData(c, arr) {
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i]._id == orderId) {
-          var order = { data: arr[i], index: i };
-
-          return order;
-        }
+  var admin = await Admin.findById(req.params.id);
+  function findIndexandData(c, arr) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i]._id == orderId) {
+        var order = { data: arr[i], index: i };
+        return order;
       }
     }
+  }
 
-    var order = findIndexandData(orderId, user.pending);
+  var order = findIndexandData(orderId, admin.pending);
 
-    order.data.orderStatus = orderStatus;
+  order.data.orderStatus = orderStatus;
 
-    user.history.unshift(order.data);
-    user.pending.splice(order.index, 1);
+  admin.history.unshift(order.data);
+  admin.pending.splice(order.index, 1);
+  await admin.save();
 
-    await user.save();
-    var customer = await User.findById(user.history[0].userId);
-    customerorder = findIndexandData(orderId, customer.history);
-    customerorder.data.orderStatus = orderStatus;
-    await customer.save();
-    res.send("order confirmed");
+  var customer = await User.findById(admin.history[0].userId);
+  customerorder = findIndexandData(orderId, customer.history);
+  customerorder.data.orderStatus = orderStatus;
+  await customer.save();
+  const token = admin.expoNotificationToken;
+  console.log("status", orderStatus);
+  const orderStatusString = orderStatus == 1 ? "rejected" : "accepted";
+  console.log("status string", orderStatusString);
+
+  sendNotification(
+    token,
+    "Order status updated",
+    `Your order is ${orderStatusString} by the canteen owner.`
+  );
+  res.send("order confirmed");
   // } catch (err) {
   //   res.status(400).send(JSON.parse("Error Occured"));
   // }
@@ -152,8 +157,6 @@ router.get("/admin/pending/:id", async (req, res) => {
 
 router.get("/admin/pendingOrders/:id", async (req, res) => {
   const user = await Admin.findById(req.params.id);
-  console.log(req.params.id);
-  console.log(user);
   for (var i = 0; i < user.pending.length; i++) {
     for (var j = 0; j < user.pending[i].items.length; j++) {
       let item = await FoodItem.findById(

@@ -19,40 +19,58 @@ router.get("/user/menu/:hall", async (req, res) => {
   const foodItems = await FoodItem.find({ hall: req.params.hall }).sort(
     "category"
   );
+  res.send(foodItems);
+});
+router.get("/admin/menu/:hall", async (req, res) => {
+  const foodItems = await FoodItem.find({ hall: req.params.hall }).sort(
+    "category"
+  );
   console.log(foodItems);
   res.send(foodItems);
 });
 
-router.post("/menu", [upload.single("image")], async (req, res) => {
-  console.log(req.file, req.body);
-  try {
-    const fileStr = req.file.path;
-    console.log(req.file.path);
-    const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-      folder: `foodItems/hall${req.body.hall}`,
-    });
-    console.log(uploadResponse.url);
-    const foodItem = new FoodItem(
-      Object.assign(
-        _.pick(req.body, ["title", "hall", "description", "category", "price"]),
-        {
-          image: uploadResponse.url,
-        }
-      )
-    );
-    await foodItem.save();
-  } catch (err) {
-    console.error(err);
-    // res.status(500).send(json({ err: 'Something went wrong' });
+router.post(
+  "/admin/menu",
+  [auth, admin],
+  [upload.single("image")],
+  async (req, res) => {
+    console.log(req.file, req.body);
+    try {
+      const fileStr = req.file.path;
+      console.log(req.file.path);
+      const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+        folder: `foodItems/hall${req.body.hall}`,
+      });
+      console.log(uploadResponse.url);
+      const foodItem = new FoodItem(
+        Object.assign(
+          _.pick(req.body, [
+            "title",
+            "hall",
+            "description",
+            "category",
+            "price",
+          ]),
+          {
+            image: uploadResponse.url,
+          }
+        )
+      );
+      await foodItem.save();
+      res.send(foodItem);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Something went wrong");
+    }
   }
-});
+);
 
 router.delete("/menu", [auth, admin], async (req, res) => {
   const a = await FoodItem.deleteMany();
   res.send(a);
 });
 
-router.delete("/menu/:id", [auth, admin], async (req, res) => {
+router.delete("/admin/menu/:id", [auth, admin], async (req, res) => {
   const foodItem = await FoodItem.findByIdAndRemove(req.params.id);
 
   if (!foodItem)
@@ -61,7 +79,7 @@ router.delete("/menu/:id", [auth, admin], async (req, res) => {
   res.send(foodItem);
 });
 
-router.put("/menu/:id", async (req, res) => {
+router.put("/admin/menu/:id", [auth, admin], async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 

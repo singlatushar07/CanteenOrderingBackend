@@ -9,7 +9,6 @@ const auth = require("../middleware/auth");
 require("dotenv").config();
 
 const nodemailer = require("nodemailer");
-const { getMaxListeners } = require("npm");
 const mail = require("../middleware/mail");
 
 verificationrouter.post("/user/verify", async (req, res) => {

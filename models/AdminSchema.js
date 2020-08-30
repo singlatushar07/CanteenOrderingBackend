@@ -83,6 +83,7 @@ AdminSchema.methods.generateAuthToken = function () {
       hall: this.hall,
       mobile: this.mobile,
       imagePath: this.imagePath,
+      isAdmin: true,
     },
     process.env.jwtPrivateKey
   );

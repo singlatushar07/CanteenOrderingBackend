@@ -26,6 +26,7 @@ mongoose
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.error("Could not connect to MongoDB...", err));
 app.use("/user/expoPushTokens", authMiddleware);
+app.use("/admin/expoPushTokens", authMiddleware);
 app.use(express.json());
 app.use("/", history);
 app.use("/", auth);
