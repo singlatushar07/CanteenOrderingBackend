@@ -75,6 +75,25 @@ router.get("/user/history/:id", async (req, res) => {
   res.send(user.history);
 });
 
+router.get("/admin/history/:id", async (req, res) => {
+  let admin = await Admin.findById(req.params.id);
+  admin = admin.toObject();
+  for (var i = 0; i < admin.history.length; i++) {
+    for (var j = 0; j < admin.history[i].items.length; j++) {
+      let item = await FoodItem.findById(
+        admin.history[i].items[j].id
+      ).map((item) => item.toObject());
+      item.quantity = admin.history[i].items[j].quantity;
+      admin.history[i].items[j] = item;
+      const user = await User.findById(admin.history[i].userId);
+      admin.history[i].userEmail = user.email;
+    }
+    console.log(admin.history[0]);
+  }
+
+  res.send(admin.history);
+});
+
 router.get("/user/:id/fetch-paginated-data", async (req, res) => {
   var pageNo = parseInt(req.query.pageNo);
   var pageSize = parseInt(req.query.pageSize);
@@ -139,7 +158,7 @@ router.get("/admin/pending/:id", async (req, res) => {
   customerorder = findIndexandData(orderId, customer.history);
   customerorder.data.orderStatus = orderStatus;
   await customer.save();
-  const token = admin.expoNotificationToken;
+  const token = customer.expoNotificationToken;
   console.log("status", orderStatus);
   const orderStatusString = orderStatus == 1 ? "rejected" : "accepted";
   console.log("status string", orderStatusString);
