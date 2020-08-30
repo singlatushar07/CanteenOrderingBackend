@@ -34,10 +34,8 @@ router.post(
   [auth, admin],
   [upload.single("image")],
   async (req, res) => {
-    console.log(req.file, req.body);
     try {
       const fileStr = req.file.path;
-      console.log(req.file.path);
       const uploadResponse = await cloudinary.uploader.upload(fileStr, {
         folder: `foodItems/hall${req.body.hall}`,
       });
@@ -79,29 +77,41 @@ router.delete("/admin/menu/:id", [auth, admin], async (req, res) => {
   res.send(foodItem);
 });
 
-router.put("/admin/menu/:id", [auth, admin], async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+router.put(
+  "/admin/menu/:id",
+  [auth, admin],
+  [upload.single("image")],
+  async (req, res) => {
+    console.log(req.body);
+    const { error } = validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+    console.log(req.file);
 
-  const foodItem = await FoodItem.findByIdAndUpdate(
-    req.params.id,
-    {
-      category: req.body.category,
-      title: req.body.title,
-      price: req.body.price,
-      description: req.body.description,
-      hall: req.body.hall,
-    },
-    {
-      new: true,
-    }
-  );
+    const fileStr = req.file.path;
+    const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+      folder: `foodItems/hall${req.body.hall}`,
+    });
+    const foodItem = await FoodItem.findByIdAndUpdate(
+      req.params.id,
+      {
+        category: req.body.category,
+        title: req.body.title,
+        price: req.body.price,
+        description: req.body.description,
+        hall: req.body.hall,
+        image: uploadResponse.url,
+      }
+      // {
+      //   new: true,
+      // }
+    );
 
-  if (!foodItem)
-    return res.status(404).send("The item with the given ID was not found.");
+    if (!foodItem)
+      return res.status(404).send("The item with the given ID was not found.");
 
-  res.send(foodItem);
-});
+    res.send(foodItem);
+  }
+);
 
 router.get("/user/menu/:id", async (req, res) => {
   const foodItems = await FoodItem.find({ _id: req.params.id });
