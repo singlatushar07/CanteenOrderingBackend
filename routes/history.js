@@ -76,8 +76,6 @@ router.get("/user/history/:id", async (req, res) => {
   res.send(user.history);
 });
 
-
-
 router.get("/admin/history/:id", async (req, res) => {
   let admin = await Admin.findById(req.params.id);
   admin = admin.toObject();
@@ -91,7 +89,6 @@ router.get("/admin/history/:id", async (req, res) => {
       const user = await User.findById(admin.history[i].userId);
       admin.history[i].userEmail = user.email;
     }
-    console.log(admin.history[0]);
   }
 
   res.send(admin.history);
@@ -133,10 +130,22 @@ router.get("/user/:id/fetch-paginated-data", async (req, res) => {
     return res.status(200).json(response);
   }
 });
+// gives
 router.get("/admin/fetch-paginated-data/:hall", async (req, res) => {
   var pageNo = parseInt(req.query.pageNo);
   var pageSize = parseInt(req.query.pageSize);
-  var user = await User.find({ hall: req.params.hall })
+  // var user = await User.find({ hall: req.params.hall });
+  var admin = await Admin.findOne({ hall: req.params.hall });
+  let userIds = new Set();
+  for (let i = 0; i < admin.history.length; i++) {
+    userIds.add(admin.history[i].userId);
+  }
+  userIds = [...userIds];
+  let users = await User.find({
+    _id: {
+      $in: userIds,
+    },
+  });
   // user = user.history;
   //checking if page number is invalid
   if (pageNo <= 0) {
@@ -150,8 +159,12 @@ router.get("/admin/fetch-paginated-data/:hall", async (req, res) => {
     var index = parseInt(pageNo - 1) * parseInt(pageSize) + 1;
     var list = [];
     for (var i = 0; i < pageSize; i++) {
-      if (index > user.length) break;
-      list.push({name:user[index - 1].name,id:user[index-1].id,room: user[index-1].room});
+      if (index > users.length) break;
+      list.unshift({
+        name: users[index - 1].name,
+        id: users[index - 1].id,
+        room: users[index - 1].room,
+      });
       index++;
     }
 
@@ -163,15 +176,13 @@ router.get("/admin/fetch-paginated-data/:hall", async (req, res) => {
   }
 });
 
+// gives data
 router.get("/admin_user/fetch-paginated-data/:id/:hall", async (req, res) => {
   var pageNo = parseInt(req.query.pageNo);
   var pageSize = parseInt(req.query.pageSize);
-  var user = await User.findById(req.params.id)
-  
-  user2 = user.history
-  
-  // console.log(user2)
-  
+  var user = await User.findById(req.params.id);
+
+  user2 = user.history;
   //checking if page number is invalid
   if (pageNo <= 0) {
     var response = {
@@ -184,14 +195,22 @@ router.get("/admin_user/fetch-paginated-data/:id/:hall", async (req, res) => {
     var index = parseInt(pageNo - 1) * parseInt(pageSize) + 1;
     var list = [];
     for (var i = 0; i < pageSize; i++) {
-      if (index >user2.length) break;
-      if(user2[index-1].orderStatus != 0 && user2[index-1].hall== req.params.hall){
-
-        list.push(user2[index-1]);
-        // console.log(user2[index-1])
+      if (index > user2.length) break;
+      if (
+        user2[index - 1].orderStatus != 0 &&
+        user2[index - 1].hall == req.params.hall
+      ) {
+        for (var j = 0; j < user2[index - 1].items.length; j++) {
+          let item = await FoodItem.findById(
+            user2[index - 1].items[j].id
+          ).map((item) => item.toObject());
+          item.quantity = user2[index - 1].items[j].quantity;
+          user2[index - 1].items[j] = item;
+        }
+        list.push(user2[index - 1]);
       }
       // let k = user2.find(({ orderStatus }) => orderStatus == 1 )
-      
+
       index++;
     }
 
@@ -231,9 +250,7 @@ router.get("/admin/pending/:id", async (req, res) => {
   customerorder.data.orderStatus = orderStatus;
   await customer.save();
   const token = customer.expoNotificationToken;
-  console.log("status", orderStatus);
   const orderStatusString = orderStatus == 1 ? "rejected" : "accepted";
-  console.log("status string", orderStatusString);
 
   sendNotification(
     token,

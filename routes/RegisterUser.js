@@ -29,7 +29,6 @@ userrouter.post("/user/register", upload.single("image"), async (req, res) => {
     res.status(400).send("User is already registered");
   } else {
     const OTP = otp();
-    console.log(OTP);
     if (user) user.remove();
 
     try {
@@ -114,7 +113,6 @@ userrouter.put("/register/changepassword", async (req, res) => {
 
 userrouter.post("/user/register/forget", async (req, res) => {
   const OTP = otp();
-  console.log(OTP);
   const user = await User.findOneAndUpdate(
     { email: req.body.email },
     {

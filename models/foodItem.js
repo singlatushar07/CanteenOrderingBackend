@@ -48,11 +48,8 @@ function validateItem(foodItem) {
   });
 
   // return Joi.validate(foodItem, schema);
-  console.log(foodItem);
   return schema.validate(foodItem);
 }
 
 exports.FoodItem = FoodItem;
 exports.validate = validateItem;
-
-

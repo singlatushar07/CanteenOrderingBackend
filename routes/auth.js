@@ -6,7 +6,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/AdminSchema");
 authrouter.route("/user/auth").post(async (req, res) => {
-  console.log("fsdjkkf");
   let user = await User.findOne({ email: req.body.email });
   if (!user) {
     return res.status(400).send("Invalid E-mail or Password.");
@@ -28,7 +27,6 @@ authrouter.route("/user/auth").post(async (req, res) => {
   }
 });
 authrouter.route("/admin/auth").post(async (req, res) => {
-  console.log("hgjhguj");
   let user = await Admin.findOne({ email: req.body.email });
   if (!user) {
     return res.status(400).send("Invalid E-mail or Password.");

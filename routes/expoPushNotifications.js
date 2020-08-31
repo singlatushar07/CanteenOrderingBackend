@@ -10,7 +10,6 @@ router.post("/user/expoPushTokens", async (req, res) => {
       expoNotificationToken: req.body.token,
     }
   );
-  console.log(user);
   res.send("Token set successfully");
 });
 
@@ -21,7 +20,6 @@ router.post("/admin/expoPushTokens", async (req, res) => {
       expoNotificationToken: req.body.token,
     }
   );
-  console.log(user);
   res.send("Token set successfully");
 });
 

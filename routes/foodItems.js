@@ -25,7 +25,6 @@ router.get("/admin/menu/:hall", async (req, res) => {
   const foodItems = await FoodItem.find({ hall: req.params.hall }).sort(
     "category"
   );
-  console.log(foodItems);
   res.send(foodItems);
 });
 
@@ -39,7 +38,6 @@ router.post(
       const uploadResponse = await cloudinary.uploader.upload(fileStr, {
         folder: `foodItems/hall${req.body.hall}`,
       });
-      console.log(uploadResponse.url);
       const foodItem = new FoodItem(
         Object.assign(
           _.pick(req.body, [
@@ -82,10 +80,8 @@ router.put(
   [auth, admin],
   [upload.single("image")],
   async (req, res) => {
-    console.log(req.body);
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
-    console.log(req.file);
 
     const fileStr = req.file.path;
     const uploadResponse = await cloudinary.uploader.upload(fileStr, {
@@ -115,7 +111,6 @@ router.put(
 
 router.get("/user/menu/:id", async (req, res) => {
   const foodItems = await FoodItem.find({ _id: req.params.id });
-  console.log(foodItems);
   res.status(200).send(foodItems);
 });
 

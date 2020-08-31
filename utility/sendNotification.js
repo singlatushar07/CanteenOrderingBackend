@@ -17,8 +17,6 @@ async function sendNotification(token, title, message) {
   });
 
   const data = await response;
-  console.log(data);
 }
 
 module.exports = sendNotification;
-// sendNotification("ExponentPushToken[NG4z-CCwkSj0LJNNR9X-wC]", "hell", "fsd");
