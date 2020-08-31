@@ -5,6 +5,7 @@ const { FoodItem } = require("../models/foodItem");
 const Admin = require("../models/AdminSchema");
 const sendNotification = require("../utility/sendNotification");
 const userrouter = require("./RegisterUser");
+const { route } = require("./foodItems");
 
 router.get("/history", async (req, res) => {
   const foodItems = await User.find();
@@ -75,6 +76,8 @@ router.get("/user/history/:id", async (req, res) => {
   res.send(user.history);
 });
 
+
+
 router.get("/admin/history/:id", async (req, res) => {
   let admin = await Admin.findById(req.params.id);
   admin = admin.toObject();
@@ -120,6 +123,74 @@ router.get("/user/:id/fetch-paginated-data", async (req, res) => {
         user[index - 1].items[j] = item;
       }
       list.push(user[index - 1]);
+      index++;
+    }
+
+    var response = {
+      success: true,
+      list: list,
+    };
+    return res.status(200).json(response);
+  }
+});
+router.get("/admin/fetch-paginated-data/:hall", async (req, res) => {
+  var pageNo = parseInt(req.query.pageNo);
+  var pageSize = parseInt(req.query.pageSize);
+  var user = await User.find({ hall: req.params.hall })
+  // user = user.history;
+  //checking if page number is invalid
+  if (pageNo <= 0) {
+    var response = {
+      success: false,
+      message: "Invalid Page Number",
+    };
+    return res.status(200).json(response);
+  } else {
+    //fetch data from database based on given page no and page size
+    var index = parseInt(pageNo - 1) * parseInt(pageSize) + 1;
+    var list = [];
+    for (var i = 0; i < pageSize; i++) {
+      if (index > user.length) break;
+      list.push({name:user[index - 1].name,id:user[index-1].id,room: user[index-1].room});
+      index++;
+    }
+
+    var response = {
+      success: true,
+      list: list,
+    };
+    return res.status(200).json(response);
+  }
+});
+
+router.get("/admin_user/fetch-paginated-data/:id", async (req, res) => {
+  var pageNo = parseInt(req.query.pageNo);
+  var pageSize = parseInt(req.query.pageSize);
+  var user = await User.findById(req.params.id)
+  user2 = user.history
+  
+  // console.log(user2)
+  
+  //checking if page number is invalid
+  if (pageNo <= 0) {
+    var response = {
+      success: false,
+      message: "Invalid Page Number",
+    };
+    return res.status(200).json(response);
+  } else {
+    //fetch data from database based on given page no and page size
+    var index = parseInt(pageNo - 1) * parseInt(pageSize) + 1;
+    var list = [];
+    for (var i = 0; i < pageSize; i++) {
+      if (index >user2.length) break;
+      if(user2[index-1].orderStatus != 0){
+
+        list.push(user2[index-1]);
+        console.log(user2[index-1])
+      }
+      // let k = user2.find(({ orderStatus }) => orderStatus == 1 )
+      
       index++;
     }
 
