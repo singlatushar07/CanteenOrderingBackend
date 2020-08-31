@@ -163,10 +163,11 @@ router.get("/admin/fetch-paginated-data/:hall", async (req, res) => {
   }
 });
 
-router.get("/admin_user/fetch-paginated-data/:id", async (req, res) => {
+router.get("/admin_user/fetch-paginated-data/:id/:hall", async (req, res) => {
   var pageNo = parseInt(req.query.pageNo);
   var pageSize = parseInt(req.query.pageSize);
   var user = await User.findById(req.params.id)
+  
   user2 = user.history
   
   // console.log(user2)
@@ -184,10 +185,10 @@ router.get("/admin_user/fetch-paginated-data/:id", async (req, res) => {
     var list = [];
     for (var i = 0; i < pageSize; i++) {
       if (index >user2.length) break;
-      if(user2[index-1].orderStatus != 0){
+      if(user2[index-1].orderStatus != 0 && user2[index-1].hall== req.params.hall){
 
         list.push(user2[index-1]);
-        console.log(user2[index-1])
+        // console.log(user2[index-1])
       }
       // let k = user2.find(({ orderStatus }) => orderStatus == 1 )
       
