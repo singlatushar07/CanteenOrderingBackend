@@ -8,7 +8,7 @@ module.exports = function (name, otp, email) {
     service: "gmail",
     auth: {
       user: "canteenorderingapp",
-      pass: "sirsaharyana",
+      pass: "CanteenOrdering",
     },
   });
 
